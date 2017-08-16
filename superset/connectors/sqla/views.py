@@ -160,10 +160,10 @@ class TableModelView(DatasourceModelView, DeleteMixin):  # noqa
     edit_title = _('Edit Table')
 
     list_columns = [
-        'link', 'database',
+        'link2', 'database',
         'changed_by_', 'modified']
     order_columns = [
-        'link', 'database', 'changed_on_']
+        'link2', 'database', 'changed_on_']
     add_columns = ['database', 'schema', 'table_name']
     edit_columns = [
         'table_name', 'sql', 'filter_select_enabled', 'slices',
@@ -215,7 +215,7 @@ class TableModelView(DatasourceModelView, DeleteMixin):  # noqa
     base_filters = [['id', DatasourceFilter, lambda: []]]
     label_columns = {
         'slices': _("Associated Slices"),
-        'link': _("Table"),
+        'link2': _("Table2"),
         'changed_by_': _("Changed By"),
         'database': _("Database"),
         'changed_on_': _("Last Changed"),

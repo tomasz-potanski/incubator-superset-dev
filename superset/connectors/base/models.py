@@ -95,6 +95,10 @@ class BaseDatasource(AuditMixinNullable, ImportMixin):
         return '/{}/edit/{}'.format(self.baselink, self.id)
 
     @property
+    def url_lab(self):
+        return '/superset/sqllab'
+
+    @property
     def explore_url(self):
         if self.default_endpoint:
             return self.default_endpoint

@@ -207,6 +207,17 @@ class SqlaTable(Model, BaseDatasource):
             '<a href="{self.explore_url}">{name}</a>'.format(**locals()))
 
     @property
+    def link2(self):
+        name = escape(self.name)
+        '''
+	logging.info("self.url {}".format(self.url))
+	logging.info("test self.url ")
+        return Markup('<a href="http://www.yahoo.co.jp">{name}</a>').format(**locals())
+        '''
+        return Markup(
+            '<a href="{self.url_lab}">{name}</a>'.format(**locals()))
+
+    @property
     def schema_perm(self):
         """Returns schema permission if present, database one otherwise."""
         return utils.get_schema_perm(self.database, self.schema)
