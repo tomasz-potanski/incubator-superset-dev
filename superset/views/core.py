@@ -299,7 +299,6 @@ class DatabaseTablesAsync(DatabaseView):
 
 appbuilder.add_view_no_menu(DatabaseTablesAsync)
 
-
 class AccessRequestsModelView(SupersetModelView, DeleteMixin):
     datamodel = SQLAInterface(DAR)
     list_columns = [
@@ -427,7 +426,9 @@ class SliceAddView(SliceModelView):  # noqa
 appbuilder.add_view_no_menu(SliceAddView)
 
 
-class DashboardModelView(SupersetModelView, DeleteMixin):  # noqa
+
+
+class DashboardModelView2(SupersetModelView, DeleteMixin):  # noqa
     datamodel = SQLAInterface(models.Dashboard)
 
     list_title = _('List Dashboards')
@@ -521,6 +522,110 @@ class DashboardModelView(SupersetModelView, DeleteMixin):  # noqa
             dashboards_url='/dashboardmodelview/list'
         )
 
+'''
+appbuilder.add_view(
+    DashboardModelView2,
+    "Analytics",
+    label=__("Analytics"),
+    icon='fa-line-chart',
+    category='',
+    category_icon='',)
+'''
+
+
+class DashboardModelView(SupersetModelView, DeleteMixin):  # noqa
+    datamodel = SQLAInterface(models.Dashboard)
+
+    list_title = _('List Dashboards')
+    show_title = _('Show Dashboard')
+    add_title = _('Add Dashboard')
+    edit_title = _('Edit Dashboard')
+
+    list_columns = ['dashboard_link', 'creator', 'modified']
+    edit_columns = [
+        'dashboard_title', 'slug', 'slices', 'owners', 'position_json', 'css',
+        'json_metadata']
+    show_columns = edit_columns + ['table_names']
+    search_columns = ('dashboard_title', 'slug', 'owners')
+    add_columns = edit_columns
+    base_order = ('changed_on', 'desc')
+    description_columns = {
+        'position_json': _(
+            "This json object describes the positioning of the widgets in "
+            "the dashboard. It is dynamically generated when adjusting "
+            "the widgets size and positions by using drag & drop in "
+            "the dashboard view"),
+        'css': _(
+            "The css for individual dashboards can be altered here, or "
+            "in the dashboard view where changes are immediately "
+            "visible"),
+        'slug': _("To get a readable URL for your dashboard"),
+        'json_metadata': _(
+            "This JSON object is generated dynamically when clicking "
+            "the save or overwrite button in the dashboard view. It "
+            "is exposed here for reference and for power users who may "
+            "want to alter specific parameters."),
+        'owners': _("Owners is a list of users who can alter the dashboard."),
+    }
+    base_filters = [['slice', DashboardFilter, lambda: []]]
+    add_form_query_rel_fields = {
+        'slices': [['slices', SliceFilter, None]],
+    }
+    edit_form_query_rel_fields = add_form_query_rel_fields
+    label_columns = {
+        'dashboard_link': _("Dashboard"),
+        'dashboard_title': _("Title"),
+        'slug': _("Slug"),
+        'slices': _("Slices"),
+        'owners': _("Owners"),
+        'creator': _("Creator"),
+        'modified': _("Modified"),
+        'position_json': _("Position JSON"),
+        'css': _("CSS"),
+        'json_metadata': _("JSON Metadata"),
+        'table_names': _("Underlying Tables"),
+    }
+
+    def pre_add(self, obj):
+        obj.slug = obj.slug.strip() or None
+        if obj.slug:
+            obj.slug = obj.slug.replace(" ", "-")
+            obj.slug = re.sub(r'\W+', '', obj.slug)
+        if g.user not in obj.owners:
+            obj.owners.append(g.user)
+        utils.validate_json(obj.json_metadata)
+        utils.validate_json(obj.position_json)
+        owners = [o for o in obj.owners]
+        for slc in obj.slices:
+            slc.owners = list(set(owners) | set(slc.owners))
+
+    def pre_update(self, obj):
+        check_ownership(obj)
+        self.pre_add(obj)
+
+    def pre_delete(self, obj):
+        check_ownership(obj)
+
+    @action("mulexport", __("Export"), __("Export dashboards?"), "fa-database")
+    def mulexport(self, items):
+        if not isinstance(items, list):
+            items = [items]
+        ids = ''.join('&id={}'.format(d.id) for d in items)
+        return redirect(
+            '/dashboardmodelview/export_dashboards_form?{}'.format(ids[1:]))
+
+    @expose("/export_dashboards_form")
+    def download_dashboards(self):
+        if request.args.get('action') == 'go':
+            ids = request.args.getlist('id')
+            return Response(
+                models.Dashboard.export_dashboards(ids),
+                headers=generate_download_headers("pickle"),
+                mimetype="application/text")
+        return self.render_template(
+            'superset/export_dashboards.html',
+            dashboards_url='/dashboardmodelview/list'
+        )
 
 appbuilder.add_view(
     DashboardModelView,
