@@ -951,6 +951,7 @@ export const visTypes = {
 
   kmeans: {
     label: 'k-Means Clustering',
+    isAnalytics: true,
     controlPanelSections: [
       {
         label: 'Analytics Options',
@@ -964,14 +965,6 @@ export const visTypes = {
         ],
       },
     ],
-    controlOverrides: {
-      all_columns_x: {
-        validators: [v.nonEmpty],
-      },
-      all_columns_y: {
-        validators: [v.nonEmpty],
-      },
-    },
   },
 };
 
@@ -981,9 +974,15 @@ export function sectionsToRender(vizType, datasourceType) {
   const viz = visTypes[vizType];
   return [].concat(
     sections.datasourceAndVizType,
-    datasourceType === 'table' ? sections.sqlaTimeSeries : sections.druidTimeSeries,
+    !viz.isAnalytics ? (
+      datasourceType === 'table' ? sections.sqlaTimeSeries : sections.druidTimeSeries
+    ) : [],
     viz.controlPanelSections,
-    datasourceType === 'table' ? sections.sqlClause : [],
-    datasourceType === 'table' ? sections.filters[0] : sections.filters,
+    !viz.isAnalytics ? (
+      datasourceType === 'table' ? sections.sqlClause : []
+    ) : [],
+    !viz.isAnalytics ? (
+      datasourceType === 'table' ? sections.filters[0] : sections.filters
+    ) : [],
   );
 }
