@@ -929,6 +929,65 @@ export const controls = {
     description: 'Font size for the biggest value in the list',
   },
 
+  num_cluster: {
+    type: 'TextControl',
+    isInt: true,
+    label: 'The Number Of Centroids',
+    default: '2',
+    description: 'The number of centroids to calculate',
+  },
+
+  fn_dist: {
+    type: 'SelectControl',
+    label: 'Distance Function',
+    choices: [
+      ['dist_norm1', '1-norm/Manhattan'],
+      ['dist_norm2', '2-norm/Euclidean'],
+      ['squared_dist_norm2', 'squared Euclidean distance'],
+      ['dist_angle', 'angle'],
+      ['dist_tanimoto', 'tanimoto'],
+    ],
+    default: 'squared_dist_norm2',
+    description: (
+      'The name of the function to use to calculate' +
+      'the distance from a data point to a centroid'
+    ),
+  },
+
+  agg_centroid: {
+    type: 'SelectControl',
+    label: 'Aggregate Function',
+    choices: [
+      ['avg', 'average'],
+      ['normalized_avg', 'normalized average'],
+    ],
+    default: 'avg',
+    description: (
+      'The name of the aggregate function used to' +
+      'determine centroids'
+    ),
+  },
+
+  max_num_iterations: {
+    type: 'TextControl',
+    isInt: true,
+    label: 'Max Iterations',
+    default: '20',
+    description: 'The maximum number of iterations to perform',
+  },
+
+  min_frac_reassigned: {
+    type: 'TextControl',
+    isFloat: true,
+    label: 'Min Fraction',
+    default: '0.001',
+    description: (
+      'The minimum fraction of centroids reassigned to continue' +
+      'iterating. When fewer than this fraction of centroids are' +
+      'reassigned in an iteration, the calculation completes'
+    ),
+  },
+
   instant_filtering: {
     type: 'CheckboxControl',
     label: 'Instant Filtering',

@@ -948,6 +948,31 @@ export const visTypes = {
       },
     },
   },
+
+  kmeans: {
+    label: 'k-Means Clustering',
+    controlPanelSections: [
+      {
+        label: 'Analytics Options',
+        controlSetRows: [
+          ['all_columns'],
+          ['num_cluster'],
+          ['fn_dist'],
+          ['agg_centroid'],
+          ['max_num_iterations'],
+          ['min_frac_reassigned'],
+        ],
+      },
+    ],
+    controlOverrides: {
+      all_columns_x: {
+        validators: [v.nonEmpty],
+      },
+      all_columns_y: {
+        validators: [v.nonEmpty],
+      },
+    },
+  },
 };
 
 export default visTypes;
