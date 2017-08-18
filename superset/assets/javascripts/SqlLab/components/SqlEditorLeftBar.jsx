@@ -28,17 +28,21 @@ class SqlEditorLeftBar extends React.PureComponent {
     this.state = {
       schemaLoading: false,
       schemaOptions: [],
+      algLoading: false,
+      algOptions: [],
       tableLoading: false,
       tableOptions: [],
     };
   }
   componentWillMount() {
     this.fetchSchemas(this.props.queryEditor.dbId);
+    this.fetchAlgorithm(this.props.queryEditor.dbId);
     this.fetchTables(this.props.queryEditor.dbId, this.props.queryEditor.schema);
   }
   onDatabaseChange(db) {
     const val = db ? db.value : null;
     this.setState({ schemaOptions: [] });
+    this.setState({ algOptions: [] });
     this.props.actions.queryEditorSetSchema(this.props.queryEditor, null);
     this.props.actions.queryEditorSetDb(this.props.queryEditor, val);
     if (!(db)) {
@@ -46,6 +50,7 @@ class SqlEditorLeftBar extends React.PureComponent {
     } else {
       this.fetchTables(val, this.props.queryEditor.schema);
       this.fetchSchemas(val);
+      this.fetchAlgorithm(val);
     }
   }
   getTableNamesBySubStr(input) {
@@ -131,6 +136,14 @@ class SqlEditorLeftBar extends React.PureComponent {
       });
     }
   }
+  fetchAlgorithm(dbId) {
+    const actualDbId = dbId || this.props.queryEditor.dbId;
+    if (actualDbId) {
+      this.setState({ algLoading: true });
+        const algOptions = [{ value: 'sgd', label: 'sgd' }, { value: 'k-means', label: 'k-means' }];
+        this.setState({ algOptions, algLoading: false });
+    }
+  }
   closePopover(ref) {
     this.refs[ref].hide();
   }
@@ -205,6 +218,22 @@ class SqlEditorLeftBar extends React.PureComponent {
               loadOptions={this.getTableNamesBySubStr.bind(this)}
             />
           }
+        </div>
+        <div className="m-t-5">
+          <Select
+            name="select-alg"
+            placeholder={`Select an algorithm (${this.state.algOptions.length})`}
+            options={this.state.algOptions}
+            value={this.props.queryEditor.alg}
+            valueRenderer={o => (
+              <div>
+                <span className="text-muted">Algorithm:</span> {o.label}
+              </div>
+            )}
+            isLoading={this.state.algLoading}
+            autosize={false}
+            onChange={this.changeSchema.bind(this)}
+          />
         </div>
         <hr />
         <div className="m-t-5">
