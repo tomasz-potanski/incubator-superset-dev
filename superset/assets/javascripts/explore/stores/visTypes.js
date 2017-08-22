@@ -957,6 +957,7 @@ export const visTypes = {
         label: 'Analytics Options',
         controlSetRows: [
           ['all_columns'],
+          ['row_limit'],
           ['num_cluster'],
           ['fn_dist'],
           ['agg_centroid'],
@@ -974,9 +975,7 @@ export function sectionsToRender(vizType, datasourceType) {
   const viz = visTypes[vizType];
   return [].concat(
     sections.datasourceAndVizType,
-    !viz.isAnalytics ? (
-      datasourceType === 'table' ? sections.sqlaTimeSeries : sections.druidTimeSeries
-    ) : [],
+    datasourceType === 'table' ? sections.sqlaTimeSeries : sections.druidTimeSeries,
     viz.controlPanelSections,
     !viz.isAnalytics ? (
       datasourceType === 'table' ? sections.sqlClause : []

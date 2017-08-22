@@ -1500,6 +1500,41 @@ class HorizonViz(NVD3TimeSeriesViz):
         '<a href="https://www.npmjs.com/package/d3-horizon-chart">'
         'd3-horizon-chart</a>')
 
+class KmeansViz(BaseViz):
+
+    """k-Means clustering
+
+    https://www.npmjs.com/package/d3-horizon-chart
+    """
+
+    viz_type = "kmeans"
+    verbose_name = _("k-Means clustering")
+    credits = (
+        '<a href="http://madlib.incubator.apache.org/docs/latest/group__grp__kmeans.html">'
+        'k-Means Clustering</a>')
+
+    def query_obj(self):
+        logging.info("[kmeans] query_obj")
+        d = super(KmeansViz, self).query_obj()
+        fd = self.form_data
+
+        if fd.get('all_columns') and (fd.get('groupby') or fd.get('metrics')):
+            raise Exception(_(
+                "Choose either fields to [Group By] and [Metrics] or "
+                "[Columns], not both"))
+
+        if fd.get('all_columns'):
+            d['columns'] = fd.get('all_columns')
+            d['groupby'] = []
+            order_by_cols = fd.get('order_by_cols') or []
+            d['orderby'] = [json.loads(t) for t in order_by_cols]
+
+        return d
+
+    def get_data(self, df):
+        logging.info("[kmeans] get_data")
+        return {}
+
 
 class MapboxViz(BaseViz):
 
@@ -1669,6 +1704,7 @@ viz_types_list = [
     HistogramViz,
     SeparatorViz,
     EventFlowViz,
+    KmeansViz,
 ]
 
 viz_types = OrderedDict([(v.viz_type, v) for v in viz_types_list
